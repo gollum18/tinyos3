@@ -28,14 +28,16 @@
 #
 # Author: Geoffrey Mainland <mainland@eecs.harvard.edu>
 #
-VERSION = "U"
-SUBVERSION = " "
+VERSION = b"U"
+SUBVERSION = b" "
 
 PLATFORM_UNKNOWN = 0
+
 
 class SFProtocolException(Exception):
     def __init__(self, *args):
         self.args = args
+
 
 class SFProtocol:
     def __init__(self, ins, outs):
@@ -46,13 +48,13 @@ class SFProtocol:
     def open(self):
         self.outs.write(VERSION + SUBVERSION)
         partner = self.ins.read(2)
-        if partner[0] != VERSION:
-            print("SFProtocol : version error")
+        if partner[0] != VERSION[0]:
+            print(f"SFProtocol : version error {partner[0]} != {VERSION[0]}")
             raise SFProtocolException("protocol version error")
 
-	# Actual version is min received vs our version
+        # Actual version is min received vs our version
         # ourversion = partner[1] & 0xff
-        
+
         if self.platform == None:
             self.platform = PLATFORM_UNKNOWN
 
@@ -60,7 +62,6 @@ class SFProtocol:
 
         # the tinyos-2.x serial forwarder doesn't do that, so the
         # connection is all set up at this point.
-
 
     def readPacket(self):
         size = self.ins.read(1)
@@ -74,4 +75,3 @@ class SFProtocol:
         self.outs.write(chr(len(packet)))
         self.outs.write(packet)
         self.outs.flush()
-        

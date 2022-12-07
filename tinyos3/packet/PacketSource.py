@@ -40,15 +40,18 @@ DEBUG = False
 
 runner = ThreadTaskRunner()
 
+
 def finishAll():
     global runner
 
     runner.cancelAll()
     runner.finish()
 
+
 class PacketSourceException(Exception):
     def __init__(self, *args):
         self.args = args
+
 
 class PacketSource(ThreadTask):
     def __init__(self, dispatcher):
@@ -96,9 +99,10 @@ class PacketSource(ThreadTask):
                 try:
                     if DEBUG:
                         print("About to run packet dispatcher!")
-                        for i in packet:
-                            print(ord(i)," ", end=' ')
-                        print()
+                        print(f"packet={packet}")
+                        # for i in packet:
+                        #     print(i, " ", end=" ")
+                        # print()
 
                     self.dispatcher.dispatchPacket(self, packet)
                 except Exception as x:
@@ -106,11 +110,11 @@ class PacketSource(ThreadTask):
                         print("Exception when dispatching packet:")
                         print(x)
                         print(traceback.print_tb(sys.exc_info()[2]))
-#                    break
+                #                    break
                 except:
                     if DEBUG:
                         print("Unknown exception when dispatching packet")
-#                    break
+        #                    break
 
         try:
             self.close()
@@ -134,4 +138,3 @@ class PacketSource(ThreadTask):
 
     def writePacket(self, packet):
         pass
-

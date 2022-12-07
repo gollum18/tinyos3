@@ -29,8 +29,10 @@
 # Author: Geoffrey Mainland <mainland@eecs.harvard.edu>
 #
 import socket
+import sys
 
 from .IO import *
+
 
 class SocketIO(IO):
     def __init__(self, host, port):
@@ -42,9 +44,7 @@ class SocketIO(IO):
         self.port = port
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setsockopt(socket.IPPROTO_TCP,
-                               socket.TCP_NODELAY,
-                               1)
+        self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.socket.settimeout(1)
         self.socket.bind(("", 0))
 
@@ -52,7 +52,7 @@ class SocketIO(IO):
         self.done = True
 
     def open(self):
-        print("SocketIO: Connecting socket to "+str(self.host)+":"+str(self.port))
+        print("SocketIO: Connecting socket to " + str(self.host) + ":" + str(self.port))
         self.socket.connect((self.host, self.port))
         self.socket.settimeout(1)
 
@@ -61,15 +61,17 @@ class SocketIO(IO):
         self.socket = None
 
     def read(self, count):
-        data = ""
+        data = b""
         while count - len(data) > 0:
             if self.isDone():
                 raise IODone()
 
             try:
                 data += self.socket.recv(count - len(data))
-            except:
+            except socket.timeout:
                 pass
+            except Exception as x:
+                print(f"SocketIO Exception in read: {repr(x)}", file=sys.stderr)
 
         return data
 
